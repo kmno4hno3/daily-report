@@ -4,9 +4,10 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build",
-    "preview": "vite preview",
+    "dev": "cd front && pnpm run dev && cd ..",
+    "build": "cd front && pnpm run build && cd ..",
+    "start": "cd front && pnpm run start && cd ..",
+    "preview": "cd front && pnpm run preview && cd ..",
     "tauri": "tauri"
   },
   "dependencies": {
