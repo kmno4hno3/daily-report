@@ -1,45 +1,124 @@
 use std::fs;
-use std::path::Path;
-// use tauri::command;
+use std::path::{Path, PathBuf};
+
+#[derive(serde::Serialize, Debug)]
+struct Report {
+    date: u32,
+}
+
+#[derive(serde::Serialize, Debug)]
+struct Month {
+    month: u32,
+    reports: Vec<Report>,
+}
+
+#[derive(serde::Serialize, Debug)]
+struct Year {
+    year: u32,
+    months: Vec<Month>,
+}
 
 #[tauri::command]
 fn greet(name: &str) -> String {
     format!("Hello, {}! You've been greeted from Rust!", name)
 }
 
-#[derive(serde::Serialize)]
-struct FileEntry {
-    name: String,
-    is_dir: bool,
-}
-
 #[tauri::command]
-fn list_directory(path: String) -> Result<Vec<FileEntry>, String> {
+fn list_directory(path: PathBuf) -> Result<Vec<Year>, String> {
     let path = Path::new(&path);
     if !path.is_dir() {
         return Err("指定されたパスはディレクトリではありません".to_string());
     }
 
-    let mut entries = Vec::new();
+    let mut years = Vec::new();
+
     match fs::read_dir(path) {
         Ok(read_dir) => {
-            for entry in read_dir {
-                if let Ok(entry) = entry {
-                    let file_type = entry.file_type().unwrap();
-                    entries.push(FileEntry {
-                        name: entry.file_name().into_string().unwrap_or_default(),
-                        is_dir: file_type.is_dir(),
-                    })
+            for year_entry in read_dir {
+                if let Ok(year_entry) = year_entry {
+                    if let Ok(file_type) = year_entry.file_type() {
+                        if !file_type.is_dir() {
+                            continue;
+                        }
+                    } else {
+                        continue;
+                    }
+
+                    let year_str_owned = year_entry.file_name().to_string_lossy().to_string();
+                    let year_str = &year_str_owned;
+                    if let Ok(year_num) = year_str.parse::<u32>() {
+                        let mut months = Vec::new();
+
+                        if let Ok(month_entries) = fs::read_dir(year_entry.path()) {
+                            for month_entry in month_entries {
+                                if let Ok(month_entry) = month_entry {
+                                    if let Ok(file_type) = month_entry.file_type() {
+                                        if !file_type.is_dir() {
+                                            continue;
+                                        }
+                                    } else {
+                                        continue;
+                                    }
+
+                                    let month_str = month_entry.file_name();
+                                    let month_str = month_str.to_string_lossy();
+                                    if let Ok(month_num) = month_str.parse::<u32>() {
+                                        let mut reports = Vec::new();
+
+                                        if let Ok(report_entries) = fs::read_dir(month_entry.path())
+                                        {
+                                            for report_entry in report_entries {
+                                                if let Ok(report_entry) = report_entry {
+                                                    if !report_entry
+                                                        .path()
+                                                        .to_string_lossy()
+                                                        .ends_with(".md")
+                                                    {
+                                                        continue;
+                                                    }
+
+                                                    let file_name_os = report_entry.file_name();
+                                                    let file_name = file_name_os.to_string_lossy();
+                                                    if let Ok(date) = file_name
+                                                        .trim_end_matches(".md")
+                                                        .parse::<u32>()
+                                                    {
+                                                        reports.push(Report { date });
+                                                    }
+                                                }
+                                            }
+                                        }
+
+                                        months.push(Month {
+                                            month: month_num,
+                                            reports,
+                                        });
+                                    }
+                                }
+                            }
+                        }
+
+                        years.push(Year {
+                            year: year_num,
+                            months,
+                        });
+                    }
                 }
             }
-            Ok(entries)
+            Ok(years)
         }
-        Err(err) => Err(format!("ディレクトリの読み込みに失敗しました: {}", err)),
+        Err(err) => Err(format!("ディレクトリ読み込み失敗: {}", err)),
     }
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
+    let path_str = "/Users/t.endo/Workspace/private/app/daily-report-sample";
+    let entries = list_directory(Path::new(&path_str).to_path_buf());
+    println!("{:?}", entries);
+
+    println!("{}", serde_json::to_string_pretty(&entries).unwrap());
+
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
         .invoke_handler(tauri::generate_handler![greet, list_directory])
