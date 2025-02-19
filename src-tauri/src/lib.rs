@@ -113,12 +113,6 @@ fn list_directory(path: PathBuf) -> Result<Vec<Year>, String> {
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    let path_str = "/Users/t.endo/Workspace/private/app/daily-report-sample";
-    let entries = list_directory(Path::new(&path_str).to_path_buf());
-    println!("{:?}", entries);
-
-    println!("{}", serde_json::to_string_pretty(&entries).unwrap());
-
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
         .invoke_handler(tauri::generate_handler![greet, list_directory])
