@@ -1,9 +1,3 @@
-// const DailyReportList = () => {
-//   return <>list</>;
-// };
-
-// export default DailyReportList;
-
 "use client";
 
 import { useState } from "react";

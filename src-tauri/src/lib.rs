@@ -111,11 +111,24 @@ fn list_directory(path: PathBuf) -> Result<Vec<Year>, String> {
     }
 }
 
+#[tauri::command]
+fn get_file_content(path: PathBuf) -> Result<String, String> {
+    if path.extension().and_then(|s| s.to_str()) == Some("md") {
+        fs::read_to_string(&path).map_err(|e| format!("ファイル読み込み失敗: {}", e))
+    } else {
+        Err("指定されたファイルはMarkdownではありません".to_string())
+    }
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
-        .invoke_handler(tauri::generate_handler![greet, list_directory])
+        .invoke_handler(tauri::generate_handler![
+            greet,
+            list_directory,
+            get_file_content
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
