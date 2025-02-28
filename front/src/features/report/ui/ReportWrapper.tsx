@@ -57,57 +57,17 @@ export const ReportWrapper = () => {
   const selectedYearReports = reportData.find((yearData) => {
     return yearData.year === Number(selectedYear);
   });
-
   const selectedMonthReports = selectedYearReports?.months.find((monthData) => {
     return monthData.month === Number(selectedMonth);
   });
-
-  if (selectedDate) {
-    const selectedDateReport = selectedMonthReports?.reports.find((report) => {
-      return report.date === Number(selectedDate);
-    });
-
-    if (selectedDateReport) {
-      const rootPath = process.env.NEXT_PUBLIC_FILE_DIR || "";
-      const filePath =
-        rootPath +
-        "/" +
-        selectedYear +
-        "/" +
-        selectedMonth +
-        "/" +
-        selectedDate;
-
-      // TODO: 詳細
-      return (
-        <div className="flex-1 p-6 overflow-y-auto">
-          <h2 className="text-2xl font-bold mb-4">{selectedDateReport.date}</h2>
-          <p className="text-gray-600 mb-4">日付: {selectedDateReport.date}</p>
-          <div className="whitespace-pre-wrap">{selectedDateReport.date}</div>
-        </div>
-      );
-    } else {
-      return (
-        <>
-          <div>日報がありません</div>
-        </>
-      );
-    }
-  }
-
-  // return (
-  //   <div className="flex-1 p-6 flex items-center justify-center">
-  //     <p className="text-gray-500">日報または月を選択してください。</p>
-  //   </div>
-  // );
+  const selectedDateReport = selectedMonthReports?.reports.find((report) => {
+    return report.date === Number(selectedDate);
+  });
 
   const renderChildren = () => {
-    if (
-      selectedMonthReports &&
-      selectedMonthReports?.reports?.length > 0 &&
-      selectedYear &&
-      selectedMonth
-    ) {
+    if (selectedDateReport) {
+      return <ReportDetail selectedDateReport={selectedDateReport} />;
+    } else {
       return (
         <ReportList
           selectedMonthReports={selectedMonthReports}
@@ -115,8 +75,6 @@ export const ReportWrapper = () => {
           selectedMonth={selectedMonth}
         />
       );
-    } else {
-      return <ReportDetail />;
     }
   };
 
