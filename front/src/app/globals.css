@@ -85,25 +85,56 @@ body {
   }
 }
 
+.tiptap {
+  &:first-child {
+    margin-top: 0;
+  }
+  
+  /* Basic editor styles */
+  & pre {
+    background: black;
+    border-radius: 0.5rem;
+    color: white;
+    font-family: "JetBrainsMono", monospace;
+    margin: 1.5rem 0;
+    padding: 0.75rem 1rem;
+  }
+  
+  & pre code {
+    background: none;
+    color: inherit;
+    font-size: 0.8rem;
+    padding: 0;
+  }
 
+  /* Heading styles */
+  & h1, h2, h3, h4, h5, h6 {
+    line-height: 1.1;
+    margin-top: 2.5rem;
+    text-wrap: pretty;
+  }
 
+  & h1, 
+  h2 {
+    margin-top: 3.5rem;
+    margin-bottom: 1.5rem;
+  }
 
-.tiptap:first-child {
-  margin-top: 0;
-}
+  & h1 { 
+    font-size: 1.4rem; 
+  }
 
-.tiptap > pre {
-  background: black;
-  border-radius: 0.5rem;
-  color: white;
-  font-family: 'JetBrainsMono', monospace;
-  margin: 1.5rem 0;
-  padding: 0.75rem 1rem;
-}
+  & h2 { 
+    font-size: 1.2rem; 
+  }
 
-.tiptap pre code {
-  background: none;
-  color: inherit;
-  font-size: 0.8rem;
-  padding: 0;
+  & h3 { 
+    font-size: 1.1rem; 
+  }
+
+  & h4, 
+  h5, 
+  h6 { 
+    font-size: 1rem; 
+  }
 }
