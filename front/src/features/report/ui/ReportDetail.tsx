@@ -1,9 +1,10 @@
 "use client";
 import { Report } from "@/src/entities/files/type";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
+import markdownit from "markdown-it";
 
 interface Props {
   selectedDateReport?: Report;
@@ -38,10 +39,11 @@ export const ReportDetail = ({
     }
   }, []);
 
+  const md = markdownit();
   const editor = useEditor(
     {
       extensions: [StarterKit],
-      content: file,
+      content: file ? md.render(file) : "",
       immediatelyRender: false,
     },
     [file]
