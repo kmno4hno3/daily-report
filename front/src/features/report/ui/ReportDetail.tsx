@@ -2,8 +2,10 @@
 import { Report } from "@/src/entities/files/type";
 import { useEffect, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
+import { useEditor, EditorContent } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
 
-interface props {
+interface Props {
   selectedDateReport?: Report;
   selectedYear?: string;
   selectedMonth?: string;
@@ -13,8 +15,7 @@ export const ReportDetail = ({
   selectedDateReport,
   selectedYear,
   selectedMonth,
-}: props) => {
-  // TODO:ファイルをここで読み込む
+}: Props) => {
   const [file, setFile] = useState<string>();
   const [error, setError] = useState("");
   const fetchFile = async (path: string) => {
@@ -23,7 +24,6 @@ export const ReportDetail = ({
         path,
       });
       setFile(result);
-      console.log(result);
     } catch (err) {
       setError("ファイルの読み込みに失敗しました");
       console.error("Error", err);
@@ -38,11 +38,21 @@ export const ReportDetail = ({
     }
   }, []);
 
+  const editor = useEditor(
+    {
+      extensions: [StarterKit],
+      content: file,
+      immediatelyRender: false,
+    },
+    [file]
+  );
+
   return selectedDateReport && file ? (
     <div className="flex-1 p-6 overflow-y-auto">
-      <h2 className="text-2xl font-bold mb-4">{selectedDateReport.date}</h2>
-      <p className="text-gray-600 mb-4">日付: {selectedDateReport.date}</p>
-      <div className="whitespace-pre-wrap">{file}</div>
+      <h2 className="text-2xl font-bold mb-4">
+        {selectedYear}/{selectedMonth}/{selectedDateReport.date}
+      </h2>
+      {editor && <EditorContent editor={editor} />}
     </div>
   ) : (
     <>
