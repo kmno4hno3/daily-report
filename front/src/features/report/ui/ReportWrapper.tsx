@@ -50,7 +50,13 @@ export const ReportWrapper = () => {
 
   const renderChildren = () => {
     if (selectedDateReport) {
-      return <ReportDetail selectedDateReport={selectedDateReport} />;
+      return (
+        <ReportDetail
+          selectedDateReport={selectedDateReport}
+          selectedYear={selectedYear}
+          selectedMonth={selectedMonth}
+        />
+      );
     } else {
       return (
         <ReportList

@@ -1,9 +1,7 @@
 "use client";
 
 import { Month, Report } from "@/src/entities/files/type";
-import { useEffect, useState } from "react";
 import Link from "next/link";
-import { invoke } from "@tauri-apps/api/core";
 
 interface props {
   selectedMonthReports?: Month;
@@ -16,27 +14,6 @@ export const ReportList = ({
   selectedYear,
   selectedMonth,
 }: props) => {
-  // TODO:ファイルをここで読み込む
-  const [files, setFiles] = useState<string>();
-  const [error, setError] = useState("");
-  const fetchFile = async (path: string) => {
-    try {
-      1;
-      setError("");
-      const result = await invoke<string>("list_directory", {
-        path,
-      });
-      setFiles(result);
-    } catch (err) {
-      setError("ファイルの読み込みに失敗しました");
-      console.error("Error", err);
-    }
-  };
-
-  useEffect(() => {
-    // fetchFile(filePath);
-  }, []);
-
   return (
     selectedMonthReports &&
     selectedYear &&
