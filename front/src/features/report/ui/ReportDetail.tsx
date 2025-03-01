@@ -1,11 +1,13 @@
 "use client";
 import { Report } from "@/src/entities/files/type";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import markdownit from "markdown-it";
-
+import CodeBlock from "@tiptap/extension-code-block";
+import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
+import { all, createLowlight } from "lowlight";
 interface Props {
   selectedDateReport?: Report;
   selectedYear?: string;
@@ -40,9 +42,16 @@ export const ReportDetail = ({
   }, []);
 
   const md = markdownit();
+  const lowlight = createLowlight(all);
   const editor = useEditor(
     {
-      extensions: [StarterKit],
+      extensions: [
+        StarterKit.configure({ codeBlock: false }),
+        CodeBlock,
+        CodeBlockLowlight.configure({
+          lowlight,
+        }),
+      ],
       content: file ? md.render(file) : "",
       immediatelyRender: false,
     },
