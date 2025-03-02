@@ -23,6 +23,7 @@
     "@tiptap/pm": "^2.11.5",
     "@tiptap/react": "^2.11.5",
     "@tiptap/starter-kit": "^2.11.5",
+    "@types/turndown": "^5.0.5",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "common": "link:@type/lowlight/lib/common",
@@ -39,7 +40,8 @@
     "react-dom": "^19.0.0",
     "tailwind-merge": "^2.6.0",
     "tailwindcss-animate": "^1.0.7",
-    "tiptap-extension": "1.0.1-alpha.0"
+    "tiptap-extension": "1.0.1-alpha.0",
+    "turndown": "^7.2.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

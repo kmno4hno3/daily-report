@@ -5,6 +5,7 @@ import { invoke } from "@tauri-apps/api/core";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import markdownit from "markdown-it";
+import TurndownService from "turndown";
 import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
 import { all, createLowlight } from "lowlight";
 interface Props {
@@ -55,12 +56,29 @@ export const ReportDetail = ({
     [file]
   );
 
-  const saveContent = () => {};
-  useEffect(() => {
+  const saveContent = async (path: string) => {
     if (editor) {
-      editor.on("blur", saveContent);
+      let turndownService = new TurndownService({
+        headingStyle: "atx",
+        codeBlockStyle: "fenced",
+        preformattedCode: true,
+      });
+      try {
+        await invoke<string>("save_content", {
+          path,
+          mdText: turndownService.turndown(editor.getHTML()),
+        });
+      } catch (e) {
+        console.log(e);
+      }
+    }
+  };
+  useEffect(() => {
+    if (editor && selectedDateReport) {
+      const path = `/Users/tatsuya/Workspace/個人開発/daily-report-files/${selectedYear}/${selectedMonth}/${selectedDateReport.date}.md`;
+      editor.on("blur", () => saveContent(path));
       return () => {
-        editor.off("blur", saveContent);
+        editor.off("blur", () => saveContent(path));
       };
     }
   }, [editor]);
