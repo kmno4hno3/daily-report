@@ -5,7 +5,6 @@ import { invoke } from "@tauri-apps/api/core";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import markdownit from "markdown-it";
-import CodeBlock from "@tiptap/extension-code-block";
 import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
 import { all, createLowlight } from "lowlight";
 interface Props {
@@ -20,34 +19,32 @@ export const ReportDetail = ({
   selectedMonth,
 }: Props) => {
   const [file, setFile] = useState<string>();
-  const [error, setError] = useState("");
-  const fetchFile = async (path: string) => {
-    try {
-      const result = await invoke<string>("get_file_content", {
-        path,
-      });
-      setFile(result);
-    } catch (err) {
-      setError("ファイルの読み込みに失敗しました");
-      console.error("Error", err);
-    }
-  };
 
   useEffect(() => {
+    const fetchFile = async (path: string) => {
+      try {
+        const result = await invoke<string>("get_file_content", {
+          path,
+        });
+        setFile(result);
+      } catch (err) {
+        console.error("Error", err);
+      }
+    };
+
     if (selectedDateReport?.date) {
       fetchFile(
         `/Users/tatsuya/Workspace/個人開発/daily-report-files/${selectedYear}/${selectedMonth}/${selectedDateReport.date}.md`
       );
     }
-  }, []);
+  }, [selectedYear, selectedMonth]);
 
   const md = markdownit();
   const lowlight = createLowlight(all);
   const editor = useEditor(
     {
       extensions: [
-        StarterKit.configure({ codeBlock: false }),
-        CodeBlock,
+        StarterKit,
         CodeBlockLowlight.configure({
           lowlight,
         }),
@@ -58,16 +55,27 @@ export const ReportDetail = ({
     [file]
   );
 
-  return selectedDateReport && file ? (
+  const saveContent = () => {};
+  useEffect(() => {
+    if (editor) {
+      editor.on("blur", saveContent);
+      return () => {
+        editor.off("blur", saveContent);
+      };
+    }
+  }, [editor]);
+
+  // TODO: 一瞬ちらつきが起きるのを改善したい
+  if (!selectedDateReport || !file) {
+    return <div>日報がありません</div>;
+  }
+
+  return (
     <div className="flex-1 p-6 overflow-y-auto">
       <h2 className="text-2xl font-bold mb-4">
         {selectedYear}/{selectedMonth}/{selectedDateReport.date}
       </h2>
       {editor && <EditorContent editor={editor} />}
     </div>
-  ) : (
-    <>
-      <div>日報がありません</div>
-    </>
   );
 };
