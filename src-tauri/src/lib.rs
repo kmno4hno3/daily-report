@@ -120,6 +120,23 @@ fn get_file_content(path: PathBuf) -> Result<String, String> {
     }
 }
 
+#[tauri::command]
+fn save_content(path: PathBuf, md_text: String) -> Result<String, String> {
+    println!("{}", md_text);
+    if path.extension().and_then(|s| s.to_str()) == Some("md") {
+        let result = fs::read_to_string(&path).map_err(|e| format!("ファイル読み込み失敗: {}", e));
+        if result.is_ok() {
+            fs::write(&path, &md_text)
+                .map_err(|e| format!("ファイル書き込み失敗: {}", e))
+                .map(|_| "成功".to_string())
+        } else {
+            result
+        }
+    } else {
+        Err("指定されたファイルはMarkdownではありません".to_string())
+    }
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
@@ -127,7 +144,8 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             greet,
             list_directory,
-            get_file_content
+            get_file_content,
+            save_content
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
