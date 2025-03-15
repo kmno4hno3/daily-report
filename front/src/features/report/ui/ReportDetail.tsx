@@ -58,7 +58,7 @@ export const ReportDetail = ({
 
   const saveContent = async (path: string) => {
     if (editor) {
-      let turndownService = new TurndownService({
+      const turndownService = new TurndownService({
         headingStyle: "atx",
         codeBlockStyle: "fenced",
         preformattedCode: true,

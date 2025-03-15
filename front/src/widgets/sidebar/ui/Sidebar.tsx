@@ -86,7 +86,7 @@ export const Sidebar: React.FC = () => {
             // 月単位
             <div key={monthData.month} className="mb-2">
               <Link
-                href={`/report/list/${selectedYear.year}/${monthData.month}`}
+                href={`/report/list?year=${selectedYear.year}&month=${monthData.month}`}
                 key={`${selectedYear.year}-${monthData.month}`}
               >
                 <button
@@ -113,7 +113,7 @@ export const Sidebar: React.FC = () => {
                 <div className="ml-6">
                   {monthData.reports.map((report) => (
                     <Link
-                      href={`/report/list/${selectedYear.year}/${monthData.month}/${report.date}`}
+                      href={`/report/list?year=${selectedYear.year}&month=${monthData.month}&day=${report.date}`}
                       key={`${report.date}`}
                     >
                       <button
