@@ -18,6 +18,12 @@ struct Year {
     months: Vec<Month>,
 }
 
+#[derive(serde::Serialize, Debug)]
+struct ResultContent {
+    is_exist: bool,
+    content: Option<String>,
+}
+
 #[tauri::command]
 fn greet(name: &str) -> String {
     format!("Hello, {}! You've been greeted from Rust!", name)
@@ -112,9 +118,15 @@ fn list_directory(path: PathBuf) -> Result<Vec<Year>, String> {
 }
 
 #[tauri::command]
-fn get_file_content(path: PathBuf) -> Result<String, String> {
+fn get_file_content(path: PathBuf) -> Result<ResultContent, String> {
     if path.extension().and_then(|s| s.to_str()) == Some("md") {
-        fs::read_to_string(&path).map_err(|e| format!("ファイル読み込み失敗: {}", e))
+        match fs::read_to_string(&path) {
+            Ok(content) => Ok(ResultContent {
+                is_exist: true,
+                content: Some(content),
+            }),
+            Err(e) => Err(format!("ファイル読み込み失敗: {}", e)),
+        }
     } else {
         Err("指定されたファイルはMarkdownではありません".to_string())
     }
@@ -122,7 +134,6 @@ fn get_file_content(path: PathBuf) -> Result<String, String> {
 
 #[tauri::command]
 fn save_content(path: PathBuf, md_text: String) -> Result<String, String> {
-    println!("{}", md_text);
     if path.extension().and_then(|s| s.to_str()) == Some("md") {
         let result = fs::read_to_string(&path).map_err(|e| format!("ファイル読み込み失敗: {}", e));
         if result.is_ok() {

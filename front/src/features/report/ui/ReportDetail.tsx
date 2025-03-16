@@ -14,17 +14,22 @@ interface Props {
   selectedMonth?: string;
 }
 
+interface ContentResult {
+  isExist: boolean;
+  content: string;
+}
+
 export const ReportDetail = ({
   selectedDateReport,
   selectedYear,
   selectedMonth,
 }: Props) => {
-  const [file, setFile] = useState<string>();
+  const [file, setFile] = useState<ContentResult | undefined>(undefined);
 
   useEffect(() => {
     const fetchFile = async (path: string) => {
       try {
-        const result = await invoke<string>("get_file_content", {
+        const result = await invoke<ContentResult>("get_file_content", {
           path,
         });
         setFile(result);
@@ -51,7 +56,7 @@ export const ReportDetail = ({
           lowlight,
         }),
       ],
-      content: file ? md.render(file) : "",
+      content: file ? md.render(file.content) : "",
       immediatelyRender: false,
     },
     [file]
