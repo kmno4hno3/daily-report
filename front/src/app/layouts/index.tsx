@@ -33,6 +33,7 @@ export const RootLayout = ({
           rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.0/styles/github-dark.min.css"
         />
+        <script src="http://localhost:8097"></script>
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}

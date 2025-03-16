@@ -34,11 +34,12 @@ export const ReportDetail = ({
     };
 
     if (selectedDateReport?.date) {
+      const basePath = process.env.NEXT_PUBLIC_FILE_DIR || "";
       fetchFile(
-        `/Users/tatsuya/Workspace/個人開発/daily-report-files/${selectedYear}/${selectedMonth}/${selectedDateReport.date}.md`
+        `${basePath}/${selectedYear}/${selectedMonth}/${selectedDateReport.date}.md`
       );
     }
-  }, [selectedYear, selectedMonth]);
+  }, [selectedDateReport, selectedYear, selectedMonth]);
 
   const md = markdownit();
   const lowlight = createLowlight(all);
